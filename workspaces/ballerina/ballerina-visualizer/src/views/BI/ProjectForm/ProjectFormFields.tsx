@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import { LocationSelector, TextField, CheckBox, LinkButton, ThemeColors, Codicon, FormCheckBox } from "@wso2/ui-toolkit";
 import styled from "@emotion/styled";
 import { useRpcContext } from "@wso2/ballerina-rpc-client";
-import { sanitizePackageName, validatePackageName } from "./utils";
+import { sanitizePackageName, validatePackageName, validateOrgName } from "./utils";
 
 const FieldGroup = styled.div`
     margin-bottom: 20px;
@@ -80,6 +80,7 @@ export function ProjectFormFields({ formData, onFormDataChange, onValidationChan
     const [packageNameTouched, setPackageNameTouched] = useState(false);
     const [showOptionalConfigurations, setShowOptionalConfigurations] = useState(false);
     const [packageNameError, setPackageNameError] = useState<string | null>(null);
+    const [orgNameError, setOrgNameError] = useState<string | null>(null);
     const [isWorkspaceSupported, setIsWorkspaceSupported] = useState(false);
 
     const handleIntegrationName = (value: string) => {
@@ -134,6 +135,12 @@ export function ProjectFormFields({ formData, onFormDataChange, onValidationChan
         setPackageNameError(error);
         onValidationChange?.(error === null);
     }, [formData.packageName, onValidationChange]);
+
+    // Real-time validation for organization name
+    useEffect(() => {
+        const error = validateOrgName(formData.orgName);
+        setOrgNameError(error);
+    }, [formData.orgName]);
 
     return (
         <>
@@ -231,6 +238,7 @@ export function ProjectFormFields({ formData, onFormDataChange, onValidationChan
                             value={formData.orgName}
                             label="Organization Name"
                             description="The organization that owns this Ballerina package."
+                            errorMsg={orgNameError || ""}
                         />
                     </FieldGroup>
                     <FieldGroup>
